@@ -1,33 +1,70 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState, useRef } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [postData, setpostData] = useState('')
+  const [initial, setInitial] = useState(0)
+  const [rows, setRows] = useState(5);
+  
+  const pageNo = useRef();
+
+  useEffect(() => {
+    fetch('https://jsonplaceholder.typicode.com/posts')
+    .then((res)=>res.json())
+    .then((res)=>setpostData(res))
+  }, [])
+
+  const handlePrev = () => {
+    if (initial <= 0)  return;
+    setInitial(initial - rows);
+  }
+
+  const handleNext = () => {
+    if (initial >= 95) return;
+    setInitial(initial + rows);
+  }
+
+  const handleRows = (e) => {
+    setRows(Number(e.target.value))
+  }
+
+  const handleJump = () =>{
+    if(0 >= pageNo.current.value || pageNo.current.value > Math.ceil(postData.length/rows)) return;
+
+    setInitial((pageNo.current.value * rows) - rows);
+  }
 
   return (
     <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+      <div className="select-row">
+        <select name="rows" id="rows" onChange={handleRows}>
+          <option value="5">5</option>
+          <option value="6">6</option>
+          <option value="7">7</option>
+        </select>
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
+
+      <div className="page-jump">
+        <input type="number" placeholder='Go to PageNo.' ref={pageNo}/>
+        <button onClick={handleJump}>Jump</button>
       </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
+
+      <div className="page-buttons">
+        <button onClick={() => handlePrev()}>Prev</button>
+        <button onClick={() => handleNext()}>Next</button>
+      </div>
+
+
+      {
+        postData && postData.slice(initial, initial + rows).map(item => (
+          <article key={item.id}>
+            <h1>{item.id}. {item.title}</h1>
+            <p>{item.body}</p>
+          </article>
+        ))
+      }
+
+     
     </>
   )
 }
