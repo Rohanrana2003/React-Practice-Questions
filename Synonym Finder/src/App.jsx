@@ -1,7 +1,4 @@
-import { useState, useEffect } from "react";
-
-
-
+import { useState } from "react";
 
 function App() {
   const [data, setData] = useState(null);
@@ -30,7 +27,7 @@ function App() {
         <button onClick={()=>fetchData(inputValue)}
               className="px-2 py-1 outline-none border-none bg-gray-400 text-white rounded-lg">Search</button>
       </div>
-
+ 
       <ul>
       {
         data && data.map((keyword, i) =>(
